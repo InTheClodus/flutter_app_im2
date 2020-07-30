@@ -53,31 +53,31 @@ class FriendListState extends State<FriendList> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: onRefresh,
-      key: refreshIndicator,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
+        onRefresh: onRefresh,
+        key: refreshIndicator,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
 //        children: <Widget>[],
-        children: data.map(
-          (item) {
-            return InkWell(
-              onTap: () => onClick(item),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: Image.network(
-                    item.userInfoEntity.faceUrl ?? "",
-                    fit: BoxFit.cover,
-                  ).image,
-                ),
-                title: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        item.remark == null || item.remark == ''
-                            ? item.userInfoEntity.nickName
-                            : item.remark,
+          children: data.map(
+                (item) {
+              return InkWell(
+                onTap: () => onClick(item),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: Image.network(
+                      item.userInfoEntity.faceUrl ?? "",
+                      fit: BoxFit.cover,
+                    ).image,
+                  ),
+                  title: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          item.remark == null || item.remark == ''
+                              ? item.userInfoEntity.identifier
+                              : item.remark,
+                        ),
                       ),
-                    ),
 //                    Text(
 //                      dateTime == null
 //                          ? ""
@@ -87,8 +87,8 @@ class FriendListState extends State<FriendList> {
 //                        fontSize: 12,
 //                      ),
 //                    ),
-                  ],
-                ),
+                    ],
+                  ),
 //                subtitle: Row(
 //                  children: <Widget>[
 //                    Expanded(
@@ -124,11 +124,11 @@ class FriendListState extends State<FriendList> {
 //                        : Text(""),
 //                  ],
 //                ),
-              ),
-            );
-          },
-        ).toList(),
-      ),
-    );
+                ),
+              );
+            },
+          ).toList(),
+        ),
+      );
   }
 }

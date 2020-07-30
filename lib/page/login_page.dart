@@ -1,6 +1,6 @@
+
 import 'package:flutter/material.dart';
-import 'package:tencent_im_plugin/tencent_im_plugin.dart';
-import 'home.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,24 +12,9 @@ class _LoginPageState extends State<LoginPage> {
   final _userPwd = TextEditingController(); //密码
 
   GlobalKey _globalKey = new GlobalKey<FormState>(); //用于检查输入框是否为空
-  onLogin() async {
-    await TencentImPlugin.initStorage(identifier: "user2");
 
-    await TencentImPlugin.login(
-      identifier: "user2",
-      userSig:
-      "eJwtzMEKgkAUheF3mW0h945OqNDKRWnRLIyYlspMdgtrHK2E6N0TdXm*A-*XHfe59zaOxYx7wJbjJm0eHV1o5FdrHJ*PVt8La0mzGAOAAHxEnB7TW3JmcCEEB4BJO6pHi1aA6PvhXKFq6KaJOKO8qn6HyjYZDxbZ7VPlh6aMNtXW1k8VnlxUyFKma-b7AwXBMPw_",
-    );
 
-    // 初始化推送通道
-//    bindXiaoMiPush();
-//    bindHuaWeiPush();
 
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => new HomePage()),
-    );
-  }
 
   @override
   void initState(){
@@ -77,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 50.0,
                 child: RaisedButton(
                   onPressed: () {
-                    onLogin();
+
                   },
                   child: Text(
                     "登录",

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_im_plugin/enums/friend_add_type_enum.dart';
+import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'apply_list.dart';
 import 'create_group.dart';
 import 'friend_list.dart';
@@ -13,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  TextEditingController cupertinoTextField=new TextEditingController();
   final List<NavigationBarData> data = [
     NavigationBarData(
       widget: ImList(),
@@ -57,6 +60,14 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> addFriend()async{
+   var rel=await TencentImPlugin.addFriend(id: cupertinoTextField.text, addType: FriendAddTypeEnum.single);
+   print(rel);
+  }
+  Future<void> deleteFriends()async{
+    TencentImPlugin.deleteFriends(ids: [cupertinoTextField.text], delFriendType: 2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +86,28 @@ class HomePageState extends State<HomePage> {
                     );
                   },
                 )
-              : Container()
+              :currentIndex==1? IconButton(
+            icon: Icon(Icons.add),
+            onPressed: (){
+              showDialog(context: context,builder: (context){
+                return new CupertinoAlertDialog(
+                  title: new Text("添加好友"),
+                  content: Column(
+                    children: <Widget>[
+                      Text('输入好友🆔'),
+                      CupertinoTextField(
+                        controller: cupertinoTextField,
+                      ),
+                      FlatButton(
+                        child: Text("添加"),
+                        onPressed: ()=>addFriend(),
+                      )
+                    ],
+                  ),
+                );
+              });
+            },
+          ):Container()
         ],
       ),
       body: IndexedStack(

@@ -42,6 +42,7 @@ class ImListState extends State<ImList> {
 
   /// 监听器
   listener(type, params) {
+    print('启动监听器');
     // 新消息时更新会话列表最近的聊天记录
     if (type == ListenerTypeEnum.RefreshConversation) {
       this.setState(() {
@@ -117,7 +118,7 @@ class ImListState extends State<ImList> {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        item.nickname == null ? (item.type == SessionType.System ? "系统账号" : "") : item.nickname,
+                        item.id == null ? (item.type == SessionType.System ? "系统账号" : "") : item.id,
                       ),
                     ),
                     Text(

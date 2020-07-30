@@ -173,6 +173,7 @@ class ImPageState extends State<ImPage> {
 
   /// 监听器
   listener(type, params) {
+    print('监听到消息');
     // 新消息时更新会话列表最近的聊天记录
     if (type == ListenerTypeEnum.NewMessages) {
       // 更新消息列表
@@ -185,6 +186,7 @@ class ImPageState extends State<ImPage> {
 
     // 消息上传通知
     if (type == ListenerTypeEnum.UploadProgress) {
+      print('监听到消息2');
       Map<String, dynamic> obj = jsonDecode(params);
 
       // 获得进度和消息实体
@@ -285,8 +287,9 @@ class ImPageState extends State<ImPage> {
         return MessageText(text: value.content);
       case MessageNodeType.Image:
         ImageMessageNode value = node;
+        print(value.imageData[ImageType.Large]?.url);
         return MessageImage(
-            url: value.imageData[ImageType.Original]?.url, path: value.path);
+            url: value.imageData[ImageType.Thumb]?.url);
       case MessageNodeType.Sound:
         SoundMessageNode value = node;
         return MessageVoice(
@@ -298,6 +301,7 @@ class ImPageState extends State<ImPage> {
         break;
       case MessageNodeType.Video:
         VideoMessageNode value = node;
+        print(node.toJson());
         return MessageVideo(
           data: message,
           videoNode: value,

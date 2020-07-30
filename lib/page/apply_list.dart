@@ -39,6 +39,10 @@ class ApplyListState extends State<ApplyList> {
       });
     });
   }
+  Future<void> onRefresh2(){
+    TencentImPlugin.getPendencyList(type: PendencyTypeEnum.BOTH).then((res){
+    });
+  }
 
   /// 点击事件
   onClick(item) {
