@@ -62,7 +62,7 @@ class HomePageState extends State<HomePage> {
 
   Future<void> addFriend()async{
    var rel=await TencentImPlugin.addFriend(id: cupertinoTextField.text, addType: FriendAddTypeEnum.single);
-   print(rel);
+   Navigator.pop(context);
   }
   Future<void> deleteFriends()async{
     TencentImPlugin.deleteFriends(ids: [cupertinoTextField.text], delFriendType: 2);

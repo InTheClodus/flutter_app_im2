@@ -39,7 +39,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  final _userName = TextEditingController(); //用户名
+  final _userName = TextEditingController(text:"user4"); //用户名
   final _userPwd = TextEditingController(text: "eJyrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwqXFqUUmUInilOzEgoLMFCUrQxMDAxMDY0NDQ4hMakVBZlEqUNzU1NTIwMAAIlqSmQsWszS1NDIxNzSDmpKZDjTXJ6wyPEa-wCPRNzwjJN-SNyCo2CW0yiLZMr0iu8zJPMfEIiWpIMLD1TUi2NVWqRYAUHUxtA__"); //密码
 
   GlobalKey _globalKey = new GlobalKey<FormState>(); //用于检查输入框是否为空

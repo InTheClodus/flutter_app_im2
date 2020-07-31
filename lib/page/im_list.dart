@@ -42,7 +42,6 @@ class ImListState extends State<ImList> {
 
   /// 监听器
   listener(type, params) {
-    print('启动监听器');
     // 新消息时更新会话列表最近的聊天记录
     if (type == ListenerTypeEnum.RefreshConversation) {
       this.setState(() {

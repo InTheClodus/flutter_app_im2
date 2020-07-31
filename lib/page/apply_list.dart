@@ -29,13 +29,20 @@ class ApplyListState extends State<ApplyList> {
       refreshIndicator.currentState.show();
     });
   }
+  listener(type, params) {
+    // 新消息时更新会话列表最近的聊天记录
+    if (type == ListenerTypeEnum.NewMessages) {
+      // 更新消息列表
+    }
+  }
 
   /// 刷新
   Future<void> onRefresh() {
-    return TencentImPlugin.getPendencyList(type: PendencyTypeEnum.BOTH)
+    return TencentImPlugin.getPendencyList(type: PendencyTypeEnum.COME_IN)
         .then((res) {
       this.setState(() {
         data = res.items ?? [];
+        print(data);
       });
     });
   }
