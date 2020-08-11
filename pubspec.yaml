@@ -40,6 +40,8 @@ dependencies:
   # 路径管理(https://pub.dev/packages/path_provider)
   path_provider: 1.4.5
   tencent_im_plugin: ^0.2.42
+  flutter_easyrefresh: ^2.1.1
+  flutter_spinkit: ^4.1.2+1
 dev_dependencies:
   flutter_test:
     sdk: flutter

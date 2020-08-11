@@ -7,8 +7,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_app_im2/listener/ListenerFactory.dart';
+import 'package:flutter_app_im2/model/DataEntity.dart';
 import 'package:flutter_app_im2/page/video_player_page.dart';
 import 'package:flutter_app_im2/utils/dialog_util.dart';
+import 'package:flutter_app_im2/widget/message_image.dart';
+import 'package:flutter_app_im2/widget/message_item.dart';
+import 'package:flutter_app_im2/widget/message_location.dart';
+import 'package:flutter_app_im2/widget/message_text.dart';
+import 'package:flutter_app_im2/widget/message_video.dart';
+import 'package:flutter_app_im2/widget/message_voice.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_im_plugin/enums/message_status_enum.dart';
@@ -106,11 +114,11 @@ class ImPageState extends State<ImPage> {
 
   /// 用作显示提示框
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
-
+  ScrollController _scrollController;
   @override
   initState() {
     super.initState();
-
+    _scrollController = ScrollController();
     init();
 
     // 获得当前登录用户
@@ -159,6 +167,7 @@ class ImPageState extends State<ImPage> {
     TencentImPlugin.removeListener(listener);
     // 取消计数器
     stopTimer();
+    _scrollController.dispose();
   }
 
   /// 初始化
@@ -300,7 +309,6 @@ class ImPageState extends State<ImPage> {
         break;
       case MessageNodeType.Video:
         VideoMessageNode value = node;
-        print(node.toJson());
         return MessageVideo(
           data: message,
           videoNode: value,
@@ -327,6 +335,7 @@ class ImPageState extends State<ImPage> {
     return MessageText(text: "[不支持的消息节点]");
   }
 
+  //<editor-fold desc="控件的相应事件">
   /// 显示界面
   showVoiceView() {
     setState(() {
@@ -676,6 +685,7 @@ class ImPageState extends State<ImPage> {
       }
     });
   }
+  //</editor-fold>
 
   @override
   Widget build(BuildContext context) {
@@ -701,10 +711,8 @@ class ImPageState extends State<ImPage> {
                 child: ListView(
                   controller: scrollController,
                   children: List.generate(
-                    data.length,
-                    (index) => LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constraints) {
+                    data.length, (index) => LayoutBuilder(
+                      builder: (BuildContext context, BoxConstraints constraints) {
                         return GestureDetector(
                           onLongPress: () => onMessageLongPress(
                               index, data[index].data, context),
@@ -747,6 +755,7 @@ class ImPageState extends State<ImPage> {
                       padding: EdgeInsets.only(left: 5, right: 5),
                     ),
                   ),
+
                   InkWell(
                     onTap: onSelectVideo,
                     child: Container(
@@ -756,6 +765,7 @@ class ImPageState extends State<ImPage> {
                       padding: EdgeInsets.only(left: 5, right: 5),
                     ),
                   ),
+
                   InkWell(
                     onTap: onSelectLocation,
                     child: Container(
@@ -849,411 +859,6 @@ class ImPageState extends State<ImPage> {
                     ),
                   )
                 : Container(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 数据实体
-class DataEntity {
-  /// 消息实体
-  final MessageEntity data;
-
-  /// 进度
-  final int progress;
-
-  DataEntity({
-    this.data,
-    this.progress,
-  });
-}
-
-/// 消息条目
-class MessageItem extends StatelessWidget {
-  /// 消息对象
-  final DataEntity data;
-
-  /// 子组件
-  final Widget child;
-
-  const MessageItem({
-    Key key,
-    this.data,
-    this.child,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          !data.data.self
-              ? Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      backgroundImage: data.data.userInfo.faceUrl == null
-                          ? null
-                          : Image.network(
-                              data.data.userInfo.faceUrl,
-                              fit: BoxFit.cover,
-                            ).image,
-                    ),
-                    Container(width: 5),
-                  ],
-                )
-              : Container(),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: data.data.self
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(data.data.userInfo.nickName ?? ""),
-                Container(height: 5),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 5,
-                    bottom: 5,
-                    left: 7,
-                    right: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(3),
-                    ),
-                  ),
-                  child: data != null &&
-                          data.data.status == MessageStatusEnum.HasRevoked
-                      ? Text("[该消息已被撤回]")
-                      : child,
-                ),
-                Container(),
-                data.progress != null && data.progress < 100
-                    ? Text("${data.progress}%")
-                    : Container(),
-              ],
-            ),
-          ),
-          data.data.self
-              ? Row(
-                  children: <Widget>[
-                    Container(width: 5),
-                    CircleAvatar(
-                      backgroundImage: data.data.userInfo.faceUrl == null
-                          ? null
-                          : Image.network(
-                              data.data.userInfo.faceUrl,
-                              fit: BoxFit.cover,
-                            ).image,
-                    ),
-                  ],
-                )
-              : Container(),
-        ],
-      ),
-    );
-  }
-}
-
-/// 消息文本
-class MessageText extends StatelessWidget {
-  final String text;
-
-  const MessageText({Key key, this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(text);
-  }
-}
-
-/// 消息图片
-class MessageImage extends StatelessWidget {
-  final String url;
-  final String path;
-
-  const MessageImage({Key key, this.url, this.path}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      width: 100,
-      child: path != null
-          ? Image.file(
-              File(path),
-              fit: BoxFit.cover,
-            )
-          : url != null
-              ? Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-    );
-  }
-}
-
-/// 消息语音
-class MessageVoice extends StatefulWidget {
-  /// 消息实体
-  final MessageEntity data;
-
-  /// 语音节点
-  final SoundMessageNode soundNode;
-
-  /// 路径
-  final String path;
-
-  /// 时间
-  final int duration;
-
-  const MessageVoice(
-      {Key key, this.data, this.soundNode, this.path, this.duration})
-      : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => MessageVoiceState();
-}
-
-class MessageVoiceState extends State<MessageVoice> {
-  /// 语音插件
-  final FlutterSound flutterSound = new FlutterSound();
-
-  /// 语音路径
-  String path;
-
-  /// 时间
-  int duration;
-
-  @override
-  void initState() {
-    super.initState();
-    path = widget.path ?? widget.soundNode.path;
-    duration = widget.duration ?? widget.soundNode.duration;
-
-    // 添加腾讯云IM监听器，监听进度
-    TencentImPlugin.addListener(tencentImListener);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    TencentImPlugin.removeListener(tencentImListener);
-  }
-
-  /// 腾讯云IM监听器
-  tencentImListener(type, params) {
-    if (type == ListenerTypeEnum.DownloadProgress) {
-      Map<String, dynamic> obj = jsonDecode(params);
-      if (widget.data == MessageEntity.fromJson(obj["message"])) {
-        ListenerFactory.progressDialogChangeNotifier.value =
-            obj["currentSize"] / obj["totalSize"];
-      }
-    }
-  }
-
-  // 播放语音
-  onPlayerOrStop() async {
-    // 如果视频文件为空，就下载视频
-    DialogUtil.showProgressLoading(context);
-    this.path = await TencentImPlugin.downloadSound(
-      message: widget.data,
-      path: path,
-    );
-    DialogUtil.cancelLoading(context);
-    if (this.mounted) {
-      this.setState(() {});
-    }
-
-    if (flutterSound.isPlaying) {
-      flutterSound.stopPlayer();
-    } else {
-      flutterSound.startPlayer(path);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPlayerOrStop,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(Icons.subject),
-          Text("$duration ″"),
-        ],
-      ),
-    );
-  }
-}
-
-/// 消息视频
-class MessageVideo extends StatefulWidget {
-  /// 消息实体
-  final MessageEntity data;
-
-  /// 视频节点
-  final VideoMessageNode videoNode;
-
-  /// 图片
-  final String image;
-
-  /// 视频
-  final String video;
-
-  /// 时长
-  final int duration;
-
-  const MessageVideo({
-    Key key,
-    this.data,
-    this.videoNode,
-    this.image,
-    this.video,
-    this.duration,
-  }) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => MessageVideoState();
-}
-
-class MessageVideoState extends State<MessageVideo> {
-  /// 缩略图文件
-  String snapshotImage;
-
-  /// 视频文件
-  String video;
-
-  @override
-  void initState() {
-    super.initState();
-
-    snapshotImage = widget.image ?? widget.videoNode.videoSnapshotInfo.path;
-    video = widget.video ?? widget.videoNode.videoInfo.path;
-
-    // 添加腾讯云IM监听器，监听进度
-    TencentImPlugin.addListener(tencentImListener);
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      TencentImPlugin.downloadVideoImage(
-        message: widget.data,
-        path: snapshotImage,
-      ).then((res) {
-        snapshotImage = res;
-        if (this.mounted) {
-          this.setState(() {});
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    TencentImPlugin.removeListener(tencentImListener);
-  }
-
-  /// 腾讯云IM监听器
-  tencentImListener(type, params) {
-    if (type == ListenerTypeEnum.DownloadProgress) {
-      Map<String, dynamic> obj = jsonDecode(params);
-      if (widget.data == MessageEntity.fromJson(obj["message"])) {
-        ListenerFactory.progressDialogChangeNotifier.value =
-            obj["currentSize"] / obj["totalSize"];
-      }
-    }
-  }
-
-  /// 视频点击事件
-  onVideoClick() async {
-    // 如果视频文件为空，就下载视频
-    DialogUtil.showProgressLoading(context);
-    this.video = await TencentImPlugin.downloadVideo(
-      message: widget.data,
-      path: video,
-    );
-    DialogUtil.cancelLoading(context);
-    if (this.mounted) {
-      this.setState(() {});
-    }
-
-    Navigator.push(
-      context,
-      new MaterialPageRoute(
-        builder: (context) => new VideoPlayerPage(
-          file: video,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onVideoClick,
-      child: Container(
-        height: 100,
-        width: 100,
-        child: Stack(
-          children: <Widget>[
-            MessageImage(path: snapshotImage),
-            Align(
-              alignment: new FractionalOffset(0.5, 0.5),
-              child: Icon(
-                Icons.play_circle_outline,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-            Positioned(
-              right: 5,
-              bottom: 5,
-              child: Text(
-                "${widget.duration ?? widget.videoNode.videoInfo.duration}″",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 消息位置
-class MessageLocation extends StatelessWidget {
-  /// 描述
-  final String desc;
-
-  /// 经度
-  final double longitude;
-
-  /// 纬度
-  final double latitude;
-
-  const MessageLocation({Key key, this.desc, this.longitude, this.latitude})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => 0,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        color: Colors.grey,
-        child: Column(
-          children: <Widget>[
-            Text(desc),
-            Text("经度:$longitude"),
-            Text("纬度:$latitude"),
           ],
         ),
       ),
